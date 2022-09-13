@@ -17,13 +17,35 @@ const handleSubmit = () => {
 
   const firstLine = data.value.substr(0, firstNewLineIndex);
 
+  if (firstLine.match(/[A-z](?=[0-9])/g) === null) {
+    //do shit
+    let test = data.value.replace(/\n/m, " ");
+    const newFirstline = test.substr(0, test.indexOf("\n"));
+    if (newFirstline.match(/[A-z](?=[0-9])/g) === null) {
+      let test2 = test.replace(/\n/m, " ");
+      const newFirstLine2 = test2.substr(0, test2.indexOf("\n"));
+      console.log(newFirstLine2);
+      //first
+
+      data.value =
+        test2.substr(0, firstNewLineIndex) +
+        " " +
+        test2.substr(newFirstLine2.search(/[A-z](?=[0-9])/), test2.length);
+
+      //last
+    }
+  }
+
+  console.log(data.value)
+
+
   const allColumns = data.value
     .substr(0, firstNewLineIndex)
-    .replace(/ [0-9]/gm)
+    .replace(/ (?=[0-9])/gm, "")
     .split(" ");
 
-  if(allColumns[0].toLowerCase().includes("indi")){
-    allColumns.splice(0,1)
+  if (allColumns[0].toLowerCase().includes("indi")) {
+    allColumns.splice(0, 1);
   }
   if (!allColumns[0].toLowerCase().includes("para")) {
     allColumns.splice(0, 0, "Parameter");
@@ -32,16 +54,19 @@ const handleSubmit = () => {
     allColumns[1].toLowerCase().includes("enhed") ||
     allColumns[1].toLowerCase().includes("unit")
   ) {
-    //do nothing
+    if (allColumns[1].toLowerCase().includes("unit")) {
+      allColumns.splice(1, 2, "Enhed");
+    }
   } else {
     allColumns.splice(1, 0, "Enhed");
   }
-  console.log(data.value.length)
+  console.log(allColumns);
+
   let rows = data.value.substr(firstNewLineIndex, data.value.length);
-  rows = rows.replace(/\n*$/gm, "")
+  rows = rows.replace(/\n*$/gm, "");
   //add square brackets around units if missing
   if (rows.indexOf("[") === -1) {
-    rows = rows.replace(/ (?=[a-z])/gm, " [");
+    rows = rows.replace(/ (?=[a-z])/gm, " ["); //TODO check if we need to lowercase rows
     rows = rows.replace(/\n(?=[0-9])/gm, "] ");
   }
 
