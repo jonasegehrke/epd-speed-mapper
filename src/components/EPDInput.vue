@@ -54,9 +54,7 @@ const handleSubmit = () => {
     allColumns[1].toLowerCase().includes("enhed") ||
     allColumns[1].toLowerCase().includes("unit")
   ) {
-    if (allColumns[1].toLowerCase().includes("unit")) {
-      allColumns.splice(1, 2, "Enhed");
-    }
+  
   } else {
     allColumns.splice(1, 0, "Enhed");
   }
