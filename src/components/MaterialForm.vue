@@ -59,14 +59,6 @@ const newMaterial = ref<Material>({
     issuedAt: "",
     validTo: "",
   },
-  transport: {
-    fuelType: "",
-    transportType: "",
-    distance: { value: -1, unit: "" },
-    capacityUtilizationInclEmpty: { value: -1, unit: "" },
-    massPerDeclaredUnit: { value: -1, unit: "" },
-    capacityUtilizationVolume: { value: -1, unit: "" },
-  },
   tags: [],
 });
 
@@ -78,7 +70,7 @@ const onSelectedOwnerOption = (payload: any) => {
 
 const getDataFromEPDInput = (data, rawData) => {
   newMaterial.value.stages = data;
-  rawEmissionData.value = rawData
+  rawEmissionData.value = rawData;
   console.log(rawData);
 };
 const getSystemBoundries = (data) => {
@@ -87,15 +79,22 @@ const getSystemBoundries = (data) => {
 
 const addTag = () => {
   newMaterial.value.tags.push(currentTag.value);
-};
-
-const addLink = () => {
-  newMaterial.value.additionalSources.push(currentLink.value);
+  console.log(newMaterial);
 };
 const deleteTag = (tag) => {
   const index = newMaterial.value.tags.indexOf(tag);
   if (index > -1) {
     newMaterial.value.tags.splice(index, 1);
+  }
+};
+
+const addLink = () => {
+  newMaterial.value.additionalSources.push(currentLink.value);
+};
+const deleteLink = (link) => {
+  const index = newMaterial.value.additionalSources.indexOf(link);
+  if (index > -1) {
+    newMaterial.value.additionalSources.splice(index, 1);
   }
 };
 
@@ -109,7 +108,7 @@ onMounted(async () => {
 });
 
 const onSubmit = async () => {
-  console.log(newMaterial.value.stages)
+  console.log(newMaterial.value.stages);
   errorMessage.value = [];
 
   //Upload files if there is anyfiles
@@ -129,16 +128,15 @@ const onSubmit = async () => {
   }
 
   Object.keys(boundries.value).forEach((bound, index) => {
-    if (boundries.value[bound] === "Relevant") {
+    if (boundries.value[bound] === "R") {
       newMaterial.value.stages[index].stageStatus = 2;
-    } else if (boundries.value[bound] === "Module not declared") {
+    } else if (boundries.value[bound] === "MND") {
       newMaterial.value.stages[index].stageStatus = 1;
-    } else if (boundries.value[bound] === "Not relevant") {
+    } else if (boundries.value[bound] === "MNR") {
       newMaterial.value.stages[index].stageStatus = 0;
     }
   });
 
-  
   //TODO POST
   console.log(newMaterial.value);
 };
@@ -206,23 +204,19 @@ const validateForm = () => {
   }
 
   rawEmissionData.value.value.forEach((element) => {
-    Object.keys(element).forEach((key, idx)=> {
-      if(element[key].unit.match(/\[[^\]]*\]/gm) === null){
-        errorMessage.value.push("Valider venligst din emission data")
-        isFormOk.value = false
-        return
+    Object.keys(element).forEach((key, idx) => {
+      if (element[key].unit.match(/\[[^\]]*\]/gm) === null) {
+        errorMessage.value.push("Valider venligst din emission data");
+        isFormOk.value = false;
+        return;
       }
-    })
+    });
   });
 
-
-  //TODO Emission validation
   if (newMaterial.value.tags.length <= 0) {
     errorMessage.value.push("Angiv venligst tags");
     isFormOk.value = false;
   }
-
-  //TODO A5 Validation
 };
 
 const emits = defineEmits(["toggleView"]);
@@ -238,15 +232,23 @@ const emits = defineEmits(["toggleView"]);
           type="link"
           placeholder="link"
           v-model="currentLink"
+          v-on:keyup.enter="addLink"
         />
         <button
           @click="addLink"
-          class="bg-slate-400 rounded-md shadow-md w-10 h-10 text-white"
+          class="bg-blue-400 rounded-md shadow-md w-10 h-10 text-white hover:bg-blue-800"
         >
           +
         </button>
       </div>
-      <div v-for="link in newMaterial.additionalSources">{{ link }}</div>
+      <div class="flex flex-col gap-2 mt-4 justify-between">
+        <span
+          v-for="link in newMaterial.additionalSources"
+          class="bg-slate-300 rounded-md flex justify-between p-2"
+        >
+          {{ link }}<button @click="deleteLink(link)" class="bg-red-500 w-6 rounded-md shadow-md text-white text-sm font-bold hover:bg-red-800">x</button>
+        </span>
+      </div>
     </div>
 
     <div class="flex flex-col">
@@ -267,6 +269,35 @@ const emits = defineEmits(["toggleView"]);
         placeholder="beskrivelse"
         v-model="newMaterial.description"
       ></textarea>
+    </div>
+
+    <div class="flex flex-col">
+      <span>Kategori (tags)</span>
+      <div class="flex gap-2">
+        <input
+          type="text"
+          v-model="currentTag"
+          class="rounded-md shadow-md p-2"
+          placeholder="tags"
+          v-on:keyup.enter="addTag"
+        />
+        <button
+          @click="addTag"
+          class="bg-blue-400 rounded-md shadow-md w-10 h-10 text-white hover:bg-blue-800"
+        >
+          +
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-2 mt-4 justify-between">
+        <span
+          v-for="tag in newMaterial.tags"
+          class="bg-slate-300 rounded-md flex justify-between p-2"
+        >
+          <p>{{ tag }}</p>
+          <button @click="deleteTag(tag)" class="bg-red-500 w-6 rounded-md shadow-md text-white text-sm font-bold hover:bg-red-800">x</button>
+        </span>
+      </div>
     </div>
 
     <div class="flex flex-col">
@@ -394,34 +425,7 @@ const emits = defineEmits(["toggleView"]);
       <InputContainer @getDataFromEPDInput="getDataFromEPDInput" />
     </div>
 
-    <div class="flex flex-col">
-      <span>Tags</span>
-      <div class="flex gap-2">
-        <input
-          type="text"
-          v-model="currentTag"
-          class="rounded-md shadow-md p-2"
-          placeholder="tags"
-        />
-        <button
-          @click="addTag"
-          class="bg-slate-400 rounded-md shadow-md w-10 h-10 text-white"
-        >
-          +
-        </button>
-      </div>
-
-      <div class="flex flex-col gap-2 mt-4 justify-between">
-        <span
-          v-for="tag in newMaterial.tags"
-          class="bg-slate-300 rounded-md flex justify-between p-2"
-        >
-          <p>{{ tag }}</p>
-          <button @click="deleteTag(tag)">x</button>
-        </span>
-      </div>
-    </div>
-
+    <!-- 
     <div class="flex flex-col gap-2 mt-4 justify-between">
       <span>Brændstoftype</span>
       <input
@@ -516,13 +520,13 @@ const emits = defineEmits(["toggleView"]);
         </div>
       </div>
     </div>
-
+ -->
     <div class="flex flex-col text-red-600 font-bold" v-if="!isFormOk">
       <span v-for="error in errorMessage"> {{ error }}</span>
     </div>
 
     <button
-      class="bg-slate-400 rounded-md shadow-md p-2 text-white"
+      class="bg-green-400 rounded-md shadow-md p-2 text-white hover:bg-green-800"
       @click="onSubmit"
     >
       Submit

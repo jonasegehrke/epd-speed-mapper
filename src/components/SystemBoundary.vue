@@ -26,14 +26,14 @@ const columnDefs = ref([
   { headerName: "D", field: "D" },
 ]);
 
-const rowData = ref<{}[]>([{ "A1A3": "Relevant" }]);
+const rowData = ref<{}[]>([{ "A1A3": "R" }]);
 
-const valueMappings = ["Relevant", "Not relevant", "Module not declared"];
+const valueMappings = ["R", "MNR", "MND"];
 
 
 const defaultColDef = ref({
   editable: true,
-  width: 140,
+  width: 70,
   cellEditor: "agSelectCellEditor",
   cellEditorParams: { values: valueMappings },
 });

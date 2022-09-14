@@ -55,9 +55,9 @@ const collectStages = async () => {
      
       <button
         @click="addNewInput"
-        class="bg-slate-400 p-2 rounded-md shadow-md w-10 h-10 text-white"
+        class="bg-blue-400 p-2 rounded-md shadow-md h-10 text-white hover:bg-blue-800"
       >
-        +
+        Add another table
       </button>
     </div>
     <div class="gap-4 flex flex-col">
