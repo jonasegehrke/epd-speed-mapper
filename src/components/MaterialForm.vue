@@ -2,6 +2,7 @@
 import SearchDropdown from "search-dropdown-vue";
 import { onMounted, ref } from "vue";
 import { uploadFiles } from "../api/services/FileuploadAPi";
+import { createMaterial } from "../api/services/MaterialApi";
 import { getAllOwners } from "../api/services/OwnerApi";
 import Material from "../types/Material";
 import Stage from "../types/Stage";
@@ -25,15 +26,22 @@ const selectedUnitValues = ref([
   { text: "M", value: 3 },
   { text: "M^2", value: 4 },
   { text: "M^3", value: 5 },
+  { text: "PSC", value: 6 },
+  { text: "MJ", value: 7 },
+  { text: "KGKM", value: 8 },
+  { text: "A", value: 9 },
 ]);
 
 const selectedMassValues = ref([
-  { text: "kg/M", value: 0 },
+  { text: "KG/M", value: 0 },
   { text: "KG/M^2", value: 1 },
   { text: "KG/M^3", value: 2 },
-  { text: "T/M", value: 3 },
-  { text: "T/M^2", value: 4 },
-  { text: "T/M^3", value: 5 }, //TODO new enums
+  { text: "KG/PSC", value: 3 },
+  { text: "KG/KG", value: 4 },
+  { text: "T/M", value: 5 },
+  { text: "T/M^2", value: 6 },
+  { text: "T/M^3", value: 7 },
+  { text: "T/PSC", value: 8 },
 ]);
 
 const newMaterial = ref<Material>({
@@ -71,7 +79,6 @@ const onSelectedOwnerOption = (payload: any) => {
 const getDataFromEPDInput = (data, rawData) => {
   newMaterial.value.stages = data;
   rawEmissionData.value = rawData;
-  console.log(rawData);
 };
 const getSystemBoundries = (data) => {
   boundries.value = data;
@@ -139,6 +146,11 @@ const onSubmit = async () => {
 
   //TODO POST
   console.log(newMaterial.value);
+
+  const response = await createMaterial(newMaterial.value)
+  console.log(response)
+
+  emits("toggleView")
 };
 
 const validateForm = () => {
@@ -384,7 +396,6 @@ const emits = defineEmits(["toggleView"]);
       <label for="units" class="block text-sm font-medium text-gray-700">
         Units
       </label>
-      <!-- TODO ask sillas -->
       <div class="flex">
         <input
           v-model="newMaterial.declaredUnit.declaredValue"

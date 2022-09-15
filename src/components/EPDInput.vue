@@ -64,7 +64,7 @@ const handleSubmit = () => {
   rows = rows.replace(/\n*$/gm, "");
   //add square brackets around units if missing
   if (rows.indexOf("[") === -1) {
-    rows = rows.replace(/ (?=[a-z])/gm, " ["); //TODO check if we need to lowercase rows
+    rows = rows.replace(/ (?=[a-z])/gm, " [");
     rows = rows.replace(/\n(?=[0-9])/gm, "] ");
   }
 
@@ -137,6 +137,8 @@ const handleSubmit = () => {
 
   return result;
 };
+
+
 </script>
 
 <template>

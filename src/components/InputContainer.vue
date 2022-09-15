@@ -31,12 +31,15 @@ const collectStages = async () => {
     inputsData.value.forEach((inputfield) => {
       Object.keys(inputfield).forEach((field) => {
         if (inputfield[field][stageEnums[stageNumber].Enum] === undefined) {
-          result.measures[field] = null;
+          //result.measures[field] = null;
+          return;
+        }
+        if (inputfield[field][stageEnums[stageNumber].Enum] === "MNR" || inputfield[field][stageEnums[stageNumber].Enum] === "MND") {
           return;
         }
 
         result.measures[field] =
-          inputfield[field][stageEnums[stageNumber].Enum]
+          Number(inputfield[field][stageEnums[stageNumber].Enum].replace(/,/gm, "."))
       });
     });
     stages.value.push(result);
@@ -44,6 +47,7 @@ const collectStages = async () => {
   console.log(stages)
   emits("getDataFromEPDInput", stages, inputsData)
 };
+
 </script>
 
 <template>
