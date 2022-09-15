@@ -2,9 +2,12 @@
 import { onMounted, ref } from "vue";
 import { getAllEDP } from "../api/services/MaterialApi";
 import MaterialForm from "./MaterialForm.vue";
+import FilterSwitch from "./FilterSwitch.vue";
+import MultiMaterialForm from "./MultiMaterialForm.vue";
 
 const materialArray = ref();
-const createNewView = ref<Boolean>(false); //change
+const createNewView = ref<Boolean>(true); //TODO CHANGE
+const isSingleEPD = ref<boolean>(false); //TODO CHANGE
 
 const fetchEPDs = async () => {
   const response = await getAllEDP();
@@ -19,11 +22,21 @@ onMounted(() => {
 const toggleView = () => {
   createNewView.value = !createNewView.value;
 };
+
+const changeMonoPolyEPD = () => {
+  isSingleEPD.value = !isSingleEPD.value
+}
+
+
 </script>
 
 <template>
-  <div v-if="createNewView" class="flex w-full h-full items-center">
-    <MaterialForm @toggleView=toggleView />
+  
+
+  <div v-if="createNewView" class="flex w-full h-full items-center flex-col ml-5">
+    <FilterSwitch @changeMonoPolyEPD="changeMonoPolyEPD"/>
+    <MaterialForm v-if="isSingleEPD" @toggleView=toggleView />
+    <MultiMaterialForm v-if="!isSingleEPD" @toggleView=toggleView />
   </div>
 
   <div v-else class="flex flex-col m-10 justify-center items-center">

@@ -118,7 +118,8 @@ const onSubmit = async () => {
   if(newMaterial.value.expectedLifespan === -2){
     delete newMaterial.value.expectedLifespan
   }
-
+  
+  console.log(newMaterial.value.stages);
   errorMessage.value = [];
 
   //Upload files if there is anyfiles
@@ -218,8 +219,6 @@ const validateForm = () => {
     isFormOk.value = false;
   }
 
-  
-
   rawEmissionData.value.value.forEach((element) => {
     Object.keys(element).forEach((key, idx) => {
       if (element[key].unit.match(/\[[^\]]*\]/gm) === null) {
@@ -242,7 +241,7 @@ const emits = defineEmits(["toggleView"]);
 <template>
   <div class="flex m-10 justify-center items-start flex-col gap-4 w-full">
     <div class="flex flex-col">
-      <span>Additional Sources</span>
+      <span class="text-lg font-bold">Additional Sources</span>
       <div class="flex gap-2">
         <input
           class="rounded-md shadow-md p-2"
@@ -269,7 +268,7 @@ const emits = defineEmits(["toggleView"]);
     </div>
 
     <div class="flex flex-col">
-      <span>Navn</span>
+      <span class="text-lg font-bold">Navn</span>
       <input
         class="rounded-md shadow-md p-2"
         type="text"
@@ -278,8 +277,8 @@ const emits = defineEmits(["toggleView"]);
       />
     </div>
 
-    <div class="flex flex-col w-full">
-      <span>Beskrivelse</span>
+    <div class="flex flex-col w-11/12">
+      <span class="text-lg font-bold">Beskrivelse</span>
       <textarea
         rows="4"
         class="block p-2.5 w-full text-sm rounded-md shadow-md"
@@ -289,7 +288,7 @@ const emits = defineEmits(["toggleView"]);
     </div>
 
     <div class="flex flex-col">
-      <span>Kategori (tags)</span>
+      <span class="text-lg font-bold">Kategori (tags)</span>
       <div class="flex gap-2">
         <input
           type="text"
@@ -318,7 +317,7 @@ const emits = defineEmits(["toggleView"]);
     </div>
 
     <div class="flex flex-col">
-      <span>EPD - Upload</span>
+      <span class="text-lg font-bold">EPD - Upload</span>
       <div>
         <input
           type="file"
@@ -331,7 +330,7 @@ const emits = defineEmits(["toggleView"]);
 
     <div class="flex">
       <div class="flex flex-col mr-6">
-        <label>Issued at</label>
+        <span class="text-lg font-bold">Issued at</span>
         <input
           type="date"
           class="rounded-md shadow-md p-2"
@@ -339,7 +338,7 @@ const emits = defineEmits(["toggleView"]);
         />
       </div>
       <div class="flex flex-col">
-        <label>Valid to</label>
+        <span class="text-lg font-bold">Valid to</span>
         <input
           type="date"
           class="rounded-md shadow-md p-2"
@@ -349,7 +348,7 @@ const emits = defineEmits(["toggleView"]);
     </div>
 
     <div class="flex flex-col">
-      <span>Owner</span>
+      <span class="text-lg font-bold">Owner</span>
       <SearchDropdown
         class="search-dropdown"
         :maxItem="5"
@@ -361,7 +360,7 @@ const emits = defineEmits(["toggleView"]);
 
     <div class="flex">
       <div class="flex flex-col mr-6">
-        <label>EPD type</label>
+        <span class="text-lg font-bold">EPD type</span>
         <select
           class="mt-2 shadow-md rounded-md p-2"
           v-model="newMaterial.epdInfo.epdProductIndustryType"
@@ -371,7 +370,7 @@ const emits = defineEmits(["toggleView"]);
         </select>
       </div>
       <div class="flex flex-col">
-        <label>EPD Specification</label>
+        <span class="text-lg font-bold">EPD Specification</span>
         <select
           class="mt-2 shadow-md rounded-md p-2"
           v-model="newMaterial.epdInfo.epdSpecificationForm"
@@ -382,13 +381,13 @@ const emits = defineEmits(["toggleView"]);
       </div>
     </div>
 
-    <div class="flex flex-col w-full">
-      <span>Systemgrænser</span>
+    <div class="flex flex-col w-11/12">
+      <span class="text-lg font-bold">Systemgrænser</span>
       <SystemBoundary @getSystemBoundries="getSystemBoundries" />
     </div>
 
     <div class="flex flex-col">
-      <span>Lifespan</span>
+      <span class="text-lg font-bold">Lifespan</span>
       <input
         class="rounded-md shadow-md p-2"
         type="number"
@@ -398,9 +397,9 @@ const emits = defineEmits(["toggleView"]);
     </div>
 
     <div class="flex flex-col">
-      <label for="units" class="block text-sm font-medium text-gray-700">
+      <span class="text-lg font-bold">
         Units
-      </label>
+      </span>
       <div class="flex">
         <input
           v-model="newMaterial.declaredUnit.declaredValue"
@@ -436,8 +435,8 @@ const emits = defineEmits(["toggleView"]);
       </div>
     </div>
 
-    <div class="flex flex-col w-full">
-      <span>Emission - values</span>
+    <div class="flex flex-col w-11/12">
+      <span class="text-lg font-bold">Emission - values</span>
       <InputContainer @getDataFromEPDInput="getDataFromEPDInput" />
     </div>
 
