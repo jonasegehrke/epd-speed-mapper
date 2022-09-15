@@ -115,7 +115,10 @@ onMounted(async () => {
 });
 
 const onSubmit = async () => {
-  console.log(newMaterial.value.stages);
+  if(newMaterial.value.expectedLifespan === -2){
+    delete newMaterial.value.expectedLifespan
+  }
+
   errorMessage.value = [];
 
   //Upload files if there is anyfiles
@@ -194,7 +197,7 @@ const validateForm = () => {
     errorMessage.value.push("EPD Specification skal udfyldes");
     isFormOk.value = false;
   }
-  if (newMaterial.value.expectedLifespan <= -1) {
+  if (newMaterial.value.expectedLifespan === -1) {
     errorMessage.value.push("Lifespan skal udfyldes");
     isFormOk.value = false;
   }
@@ -214,6 +217,8 @@ const validateForm = () => {
     errorMessage.value.push("Mass unit skal udfyldes");
     isFormOk.value = false;
   }
+
+  
 
   rawEmissionData.value.value.forEach((element) => {
     Object.keys(element).forEach((key, idx) => {
