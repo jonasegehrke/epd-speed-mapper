@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { getStageTypeEnum } from "../api/services/MaterialApi";
 import EPDInput from "./EPDInput.vue";
 
-const emits = defineEmits(["getDataFromEPDInput"])
+const emits = defineEmits(["getDataFromEPDInput"]);
 
 const amountOfInputs = ref(1);
 const stages = ref([]);
@@ -16,13 +16,11 @@ const addNewInput = () => {
 
 const handleCollectData = (data, id) => {
   inputsData.value[id] = data;
-  console.log(inputsData.value)
-  collectStages()
-  
+  collectStages();
 };
 
 const collectStages = async () => {
-  stages.value = []
+  stages.value = [];
   const stageEnums = await getStageTypeEnum();
   Object.keys(stageEnums).forEach((stageNumber) => {
     const result = {};
@@ -34,20 +32,22 @@ const collectStages = async () => {
           //result.measures[field] = null;
           return;
         }
-        if (inputfield[field][stageEnums[stageNumber].Enum] === "MNR" || inputfield[field][stageEnums[stageNumber].Enum] === "MND") {
+        if (
+          inputfield[field][stageEnums[stageNumber].Enum] === "MNR" ||
+          inputfield[field][stageEnums[stageNumber].Enum] === "MND"
+        ) {
           return;
         }
 
-        result.measures[field] =
-          Number(inputfield[field][stageEnums[stageNumber].Enum].replace(/,/gm, "."))
+        result.measures[field] = Number(
+          inputfield[field][stageEnums[stageNumber].Enum].replace(/,/gm, ".")
+        );
       });
     });
     stages.value.push(result);
   });
-  console.log(stages)
-  emits("getDataFromEPDInput", stages, inputsData)
+  emits("getDataFromEPDInput", stages, inputsData);
 };
-
 </script>
 
 <template>
@@ -56,7 +56,6 @@ const collectStages = async () => {
       <EPDInput @handleCollectData="handleCollectData" :id="amount" />
     </div>
     <div class="flex gap-6">
-     
       <button
         @click="addNewInput"
         class="bg-blue-400 p-2 rounded-md shadow-md h-10 text-white hover:bg-blue-800"

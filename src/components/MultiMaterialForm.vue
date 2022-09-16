@@ -3,9 +3,10 @@ import SearchDropdown from "search-dropdown-vue";
 import { onMounted, ref, watch } from "vue";
 import { uploadFiles } from "../api/services/FileuploadAPi";
 import { getAllOwners } from "../api/services/OwnerApi";
+import { store } from "../store";
 import Material from "../types/Material";
 import Stage from "../types/Stage";
-import InputContainer from "./InputContainer.vue";
+import MultiInputContainer from "./MultiInputContainer.vue";
 import SystemBoundary from "./SystemBoundary.vue";
 
 const stages = ref<Array<Stage>>([]);
@@ -59,7 +60,6 @@ const newMaterial = ref<Material>({
   generic: false,
   expectedLifespan: -1,
   shortName: "",
-  alias: "",
   description: "",
   additionalSources: [],
   link: uploadedFiles.value,
@@ -87,7 +87,6 @@ const allNewMaterials = ref<Array<Material>>([
     generic: false,
     expectedLifespan: -1,
     shortName: "",
-    alias: "",
     description: "",
     additionalSources: [],
     link: uploadedFiles.value,
@@ -114,6 +113,10 @@ watch(amountOfEPD, (newAmount, _oldAmount) => {
     const copy = JSON.parse(JSON.stringify(newMaterial.value));
     allNewMaterials.value.push(copy);
   }
+});
+
+watch(allNewMaterials, (newAllNewMaterials, _oldAllNewMaterials) => {
+  store.allNewMaterials = allNewMaterials;
 });
 
 const onSelectedOwnerOption = (payload: any) => {
@@ -216,7 +219,7 @@ const setEpdSpecificationForm = () => {
   });
 };
 const setExpectedLifespan = () => {
-  if (expectedLifespan.value <= -1) {
+  if (expectedLifespan.value < -1) {
     errorMessage.value.push("Missing expectedLifespan");
     isFormOk.value = false;
     return;
@@ -240,12 +243,6 @@ const uploadFileAndAssign = async () => {
   }
 };
 
-const deleteAlias = async () => {
-  allNewMaterials.value.forEach((material) => {
-    delete material.alias;
-  });
-};
-
 onMounted(async () => {
   fetchData();
 });
@@ -261,9 +258,22 @@ const onSubmit = async () => {
   setEpdSpecificationForm();
   setExpectedLifespan();
 
-  deleteAlias(); //TODO should probably only be used after collection of emission
-
   validateForm();
+
+  allNewMaterials.value.forEach((material) => {
+    if (material.expectedLifespan === -2) {
+      delete material.expectedLifespan;
+    }
+    Object.keys(boundries.value).forEach((bound, index) => {
+      if (boundries.value[bound] === "R") {
+        material.stages[index].stageStatus = 2;
+      } else if (boundries.value[bound] === "MND") {
+        material.stages[index].stageStatus = 1;
+      } else if (boundries.value[bound] === "MNR") {
+        material.stages[index].stageStatus = 0;
+      }
+    });
+  });
 
   console.log(allNewMaterials.value);
   /* if (newMaterial.value.expectedLifespan === -2) {
@@ -383,7 +393,7 @@ const emits = defineEmits(["toggleView"]);
       </div>
     </div>
     <div class="flex flex-col gap-2">
-      <span class="text-lg font-bold">Names & Aliases</span>
+      <span class="text-lg font-bold">Names</span>
       <div
         v-for="material in allNewMaterials"
         class="flex gap-2 justify-between"
@@ -395,16 +405,6 @@ const emits = defineEmits(["toggleView"]);
             type="text"
             placeholder="Navn"
             v-model="material.shortName"
-          />
-        </div>
-
-        <div class="flex flex-col">
-          <span>Alias</span>
-          <input
-            class="rounded-md shadow-md p-2"
-            type="text"
-            placeholder="alias"
-            v-model="material.alias"
           />
         </div>
       </div>
@@ -532,49 +532,55 @@ const emits = defineEmits(["toggleView"]);
     <div class="flex flex-col">
       <span class="text-lg font-bold"> Units </span>
       <div class="flex gap-8 flex-col">
-          <div v-for="material in allNewMaterials" class="flex flex-col gap-2">
-            <span>{{ material.shortName }} ({{ material.alias }})</span>
-            <div class="flex">
-              <input
-                v-model="material.declaredUnit.declaredValue"
-                type="number"
-                placeholder="Amount"
-                class="p-2 mr-1 focus:outline-1 focus:border-indigo-600 block shadow-md sm:text-sm border-gray-300 rounded-md"
-              />
-              <select
-                v-model="material.declaredUnit.declaredUnit"
-                class="rounded-md shadow-md"
+        <div v-for="material in allNewMaterials" class="flex flex-col gap-2">
+          <span>{{ material.shortName }}</span>
+          <div class="flex">
+            <input
+              v-model="material.declaredUnit.declaredValue"
+              type="number"
+              placeholder="Amount"
+              class="p-2 mr-1 focus:outline-1 focus:border-indigo-600 block shadow-md sm:text-sm border-gray-300 rounded-md"
+            />
+            <select
+              v-model="material.declaredUnit.declaredUnit"
+              class="rounded-md shadow-md"
+            >
+              <option
+                v-for="option in selectedUnitValues"
+                :value="option.value"
               >
-                <option v-for="option in selectedUnitValues" :value="option.value">
-                  {{ option.text }}
-                </option>
-              </select>
-            </div>
-    
-            <div class="flex">
-              <input
-                type="number"
-                v-model="material.declaredUnit.mass"
-                placeholder="Amount"
-                class="p-2 mr-1 focus:outline-1 focus:border-indigo-600 block shadow-md sm:text-sm border-gray-300 rounded-md"
-              />
-              <select
-                v-model="material.declaredUnit.massUnit"
-                class="rounded-md shadow-md"
-              >
-                <option v-for="option in selectedMassValues" :value="option.value">
-                  {{ option.text }}
-                </option>
-              </select>
-            </div>
+                {{ option.text }}
+              </option>
+            </select>
           </div>
+
+          <div class="flex">
+            <input
+              type="number"
+              v-model="material.declaredUnit.mass"
+              placeholder="Amount"
+              class="p-2 mr-1 focus:outline-1 focus:border-indigo-600 block shadow-md sm:text-sm border-gray-300 rounded-md"
+            />
+            <select
+              v-model="material.declaredUnit.massUnit"
+              class="rounded-md shadow-md"
+            >
+              <option
+                v-for="option in selectedMassValues"
+                :value="option.value"
+              >
+                {{ option.text }}
+              </option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="flex flex-col w-11/12">
       <span class="text-lg font-bold">Emission - values</span>
       <!-- TODO fix multi -->
-      <InputContainer @getDataFromEPDInput="getDataFromEPDInput" />
+      <MultiInputContainer @getDataFromEPDInput="getDataFromEPDInput" />
     </div>
 
     <div class="flex flex-col text-red-600 font-bold" v-if="!isFormOk">

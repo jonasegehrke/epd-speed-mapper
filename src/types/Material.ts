@@ -7,7 +7,6 @@ interface Material {
     generic: boolean,//check
     expectedLifespan: number,//check
     shortName: string, //check
-    alias: string, //check
     description: string,//check
     additionalSources: string[],
     link: string[],
