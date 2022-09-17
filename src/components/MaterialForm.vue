@@ -42,6 +42,7 @@ const selectedMassValues = ref([
   { text: "T/M^2", value: 6 },
   { text: "T/M^3", value: 7 },
   { text: "T/PSC", value: 8 },
+  { text: "KG/dm3", value: 9 },
 ]);
 
 const newMaterial = ref<Material>({
