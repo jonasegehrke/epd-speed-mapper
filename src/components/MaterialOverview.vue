@@ -31,7 +31,7 @@ const changeMonoPolyEPD = () => {
 </script>
 
 <template>
-  
+  <h1 v-if="!createNewView" class="text-red-500 text-9xl font-bold">HUSK NU FORFILAN AT TÆNDE LOCAL BACKEND!</h1>
 
   <div v-if="createNewView" class="flex w-full h-full items-center flex-col ml-5">
     <FilterSwitch @changeMonoPolyEPD="changeMonoPolyEPD"/>
