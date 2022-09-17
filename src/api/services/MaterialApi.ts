@@ -1,3 +1,4 @@
+import axios from "axios";
 import apiClient from "../../api/ApiClient";
 import type Material from "../../types/MaterialType";
 
@@ -27,19 +28,32 @@ export async function getSpecificEPD(id: string) {
 }
 
 export async function createMaterial(data: Material) {
-  console.log("this is the data", data);
+  console.log("Posting this data: ", data);
   const response = await apiClient.post("api/material/create", data);
-
-  if (response.status === 200) {
-    return response.data;
+  console.log(response.status);
+  if (response.status === 201) {
+    const localResponse = await sendToLocalBackend(data);
+    return localResponse;
   } else {
-    return {
-      status: response.status,
-      message: response.statusText,
-    };
+    alert("FAILED TO POST TO CLOUD")
+    return response
   }
 }
 
+const localClient = axios.create({
+  baseURL: "http://localhost:3000",
+  timeout: 5000,
+});
+
+export const sendToLocalBackend = async (data: Material) => {
+  const response = await localClient.post("writeMaterial", data);
+  if (response.status === 200) {
+    return response;
+  } else {
+    alert("FAILED TO POST TO LOCAL")
+    return response
+  }
+};
 
 export async function updateMaterial(data: Material, id: string) {
   const response = await apiClient.put(`api/material/${id}`, data);

@@ -13,6 +13,6 @@ export async function uploadFiles(filesToUpload: any): Promise<UploadFileRespons
         return response
       }
     } else {
-      console.log("shit")
+      console.log("Error occured while trying to upload files")
     }
   }

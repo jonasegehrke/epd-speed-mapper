@@ -4,8 +4,6 @@ import { getStageTypeEnum } from "../api/services/MaterialApi";
 import { store } from "../store";
 import MultiEPDInput from "./MultiEPDInput.vue";
 
-const emits = defineEmits(["getDataFromEPDInput"]);
-
 const amountOfInputs = ref(1);
 const stages = ref([]);
 const inputsData: any = ref([]);
@@ -16,7 +14,6 @@ const addNewInput = () => {
 };
 
 const handleCollectData = (data, id) => {
-  console.log(data);
   inputsData.value[id] = data;
   collectStages();
 };
@@ -54,8 +51,8 @@ const collectStages = async () => {
                 )
               );
             });
-          }else{
-            return
+          } else {
+            return;
           }
         });
       });
@@ -63,6 +60,7 @@ const collectStages = async () => {
     });
     material.stages = stages.value;
   });
+  store.rawMultiEPDData = inputsData.value
 };
 </script>
 
@@ -81,12 +79,14 @@ const collectStages = async () => {
     </div>
     <div class="gap-4 flex flex-col">
       <div v-for="input in inputsData" class="flex flex-col gap-1">
-        <div
-          v-for="(value, key) in input"
-          class="bg-slate-300 rounded-md p-1 justify-between flex w-96"
-        >
-          <span>{{ key }}</span>
-          <span>{{ value.unit }}</span>
+        <div v-for="(value, idx) in input">
+          <div
+            v-for="(v, k, ) in value" v-if="idx === 0"
+            class="bg-slate-300 rounded-md p-1 justify-between flex w-96"
+          >
+            <span>{{ k }}</span>
+            <span>{{ v.unit }}</span>
+          </div>
         </div>
       </div>
     </div>

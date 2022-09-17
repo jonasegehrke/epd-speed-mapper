@@ -6,7 +6,7 @@ const props = defineProps({
 
 const emit = defineEmits(["changeMonoPolyEPD"]);
 
-const isSingleEPD = ref(false); //TODO CHANGE
+const isSingleEPD = ref(true); //TODO CHANGE
 
 const switchLeft = () => {
   if (isSingleEPD.value) return;

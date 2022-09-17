@@ -2,6 +2,7 @@
 import SearchDropdown from "search-dropdown-vue";
 import { onMounted, ref, watch } from "vue";
 import { uploadFiles } from "../api/services/FileuploadAPi";
+import { createMaterial, sendToLocalBackend } from "../api/services/MaterialApi";
 import { getAllOwners } from "../api/services/OwnerApi";
 import { store } from "../store";
 import Material from "../types/Material";
@@ -125,10 +126,6 @@ const onSelectedOwnerOption = (payload: any) => {
   });
 };
 
-const getDataFromEPDInput = (data, rawData) => {
-  newMaterial.value.stages = data;
-  rawEmissionData.value = rawData;
-};
 const getSystemBoundries = (data) => {
   boundries.value = data;
 };
@@ -257,8 +254,11 @@ const onSubmit = async () => {
   setEpdProductIndustryType();
   setEpdSpecificationForm();
   setExpectedLifespan();
-
+  isFormOk.value = true;
   validateForm();
+  if (!isFormOk.value) {
+    return;
+  }
 
   allNewMaterials.value.forEach((material) => {
     if (material.expectedLifespan === -2) {
@@ -276,41 +276,17 @@ const onSubmit = async () => {
   });
 
   console.log(allNewMaterials.value);
-  /* if (newMaterial.value.expectedLifespan === -2) {
-    delete newMaterial.value.expectedLifespan;
-  }
 
+  allNewMaterials.value.forEach(async (material) => {
+    const response = await createMaterial(material);
+    console.log(response);
+    if (response.status === 200) {
+      emits("toggleView");
+    } else {
+      alert("some error occured while posting");
+    }
+  }); 
   
-
-  //Upload files if there is anyfiles
-  if (files?.value?.files != undefined && files?.value?.files?.length > 0) {
-    const response = await uploadFiles(files);
-    if (response?.data?.fileIds) {
-      newMaterial.value.link = response?.data?.fileIds;
-    }
-  }
-
-  isFormOk.value = true;
-
-  validateForm();
-
-  if (!isFormOk.value) {
-    return;
-  }
-  #TODO fix this with multi
-  Object.keys(boundries.value).forEach((bound, index) => {
-    if (boundries.value[bound] === "R") {
-      newMaterial.value.stages[index].stageStatus = 2;
-    } else if (boundries.value[bound] === "MND") {
-      newMaterial.value.stages[index].stageStatus = 1;
-    } else if (boundries.value[bound] === "MNR") {
-      newMaterial.value.stages[index].stageStatus = 0;
-    }
-  });
-
-  const response = await createMaterial(newMaterial.value);
-
-  emits("toggleView"); */
 };
 
 const validateForm = () => {
@@ -343,6 +319,19 @@ const validateForm = () => {
       errorMessage.value.push("Missing massUnit");
       isFormOk.value = false;
     }
+
+    store.rawMultiEPDData.forEach((element) => {
+      console.log(element);
+      element.forEach((prox) => {
+        Object.keys(prox).forEach((key, idx) => {
+          if (prox[key].unit.match(/\[[^\]]*\]/gm) === null) {
+            errorMessage.value.push("Valider venligst din emission data");
+            isFormOk.value = false;
+            return;
+          }
+        });
+      });
+    });
   });
 };
 
@@ -580,7 +569,7 @@ const emits = defineEmits(["toggleView"]);
     <div class="flex flex-col w-11/12">
       <span class="text-lg font-bold">Emission - values</span>
       <!-- TODO fix multi -->
-      <MultiInputContainer @getDataFromEPDInput="getDataFromEPDInput" />
+      <MultiInputContainer />
     </div>
 
     <div class="flex flex-col text-red-600 font-bold" v-if="!isFormOk">

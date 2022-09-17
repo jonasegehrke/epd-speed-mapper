@@ -118,6 +118,8 @@ const handleSubmit = () => {
     });
     results.push(result);
   });
+
+  console.log(results)
   return results;
 };
 </script>

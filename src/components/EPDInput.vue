@@ -24,20 +24,15 @@ const handleSubmit = () => {
     if (newFirstline.match(/[A-z](?=[0-9])/g) === null) {
       let test2 = test.replace(/\n/m, " ");
       const newFirstLine2 = test2.substr(0, test2.indexOf("\n"));
-      console.log(newFirstLine2);
-      //first
 
       data.value =
         test2.substr(0, firstNewLineIndex) +
         " " +
         test2.substr(newFirstLine2.search(/[A-z](?=[0-9])/), test2.length);
 
-      //last
+
     }
   }
-
-  console.log(data.value)
-
 
   const allColumns = data.value
     .substr(0, firstNewLineIndex)
@@ -58,7 +53,7 @@ const handleSubmit = () => {
   } else {
     allColumns.splice(1, 0, "Enhed");
   }
-  console.log(allColumns);
+
 
   let rows = data.value.substr(firstNewLineIndex, data.value.length);
   rows = rows.replace(/\n*$/gm, "");
@@ -134,7 +129,7 @@ const handleSubmit = () => {
       result[currentKey][allColumns[valueIndex]] = value;
     });
   });
-
+  console.log(result)
   return result;
 };
 

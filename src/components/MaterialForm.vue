@@ -86,7 +86,6 @@ const getSystemBoundries = (data) => {
 
 const addTag = () => {
   newMaterial.value.tags.push(currentTag.value);
-  console.log(newMaterial);
 };
 const deleteTag = (tag) => {
   const index = newMaterial.value.tags.indexOf(tag);
@@ -119,7 +118,6 @@ const onSubmit = async () => {
     delete newMaterial.value.expectedLifespan
   }
   
-  console.log(newMaterial.value.stages);
   errorMessage.value = [];
 
   //Upload files if there is anyfiles
@@ -148,13 +146,15 @@ const onSubmit = async () => {
     }
   });
 
-  //TODO POST
-  console.log(newMaterial.value);
-
   const response = await createMaterial(newMaterial.value)
   console.log(response)
+  if(response.status === 200){
+    emits("toggleView")
+  }else{
+    alert("some error occured while posting")
+  }
 
-  emits("toggleView")
+  
 };
 
 const validateForm = () => {

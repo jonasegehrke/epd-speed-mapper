@@ -42,8 +42,6 @@ export async function getSpecificOwner(id: string)  {
 
 export async function editOwner(id: string, data: Owner)  {
     const response = await apiClient.put(`api/owner/${id}`, data)
-
-    console.log('this is the api response', response)
     
     if (response.status === 200) {
         return response 

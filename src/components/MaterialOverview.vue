@@ -6,8 +6,8 @@ import FilterSwitch from "./FilterSwitch.vue";
 import MultiMaterialForm from "./MultiMaterialForm.vue";
 
 const materialArray = ref();
-const createNewView = ref<Boolean>(true); //TODO CHANGE
-const isSingleEPD = ref<boolean>(false); //TODO CHANGE
+const createNewView = ref<Boolean>(false); //TODO CHANGE
+const isSingleEPD = ref<boolean>(true); //TODO CHANGE
 
 const fetchEPDs = async () => {
   const response = await getAllEDP();

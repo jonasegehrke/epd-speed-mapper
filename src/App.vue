@@ -30,10 +30,4 @@ const isAuthenticated = computed(() => {
   return $AuthService.isAuthenticated();
 });
 
-onMounted(async () => {
-  console.log(`the component is now mounted.`, isAuthenticated.value);
-  if (isAuthenticated.value) {
-    console.log("now the usere is logged in");
-  }
-});
 </script>
