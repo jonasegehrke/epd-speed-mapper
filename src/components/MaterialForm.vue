@@ -4,6 +4,7 @@ import { onMounted, ref } from "vue";
 import { uploadFiles } from "../api/services/FileuploadAPi";
 import { createMaterial } from "../api/services/MaterialApi";
 import { getAllOwners } from "../api/services/OwnerApi";
+import { store } from "../store";
 import Material from "../types/Material";
 import Stage from "../types/Stage";
 import InputContainer from "./InputContainer.vue";
@@ -73,6 +74,11 @@ const newMaterial = ref<Material>({
 
 const allOwners = ref([]);
 
+
+const copyLastEPD = () => {
+  console.log(JSON.parse(localStorage.getItem("lastMaterial")))
+  newMaterial.value = JSON.parse(localStorage.getItem("lastMaterial"))
+}
 const onSelectedOwnerOption = (payload: any) => {
   newMaterial.value.ownerId = payload.id;
 };
@@ -151,6 +157,7 @@ const onSubmit = async () => {
   const response = await createMaterial(newMaterial.value)
   console.log(response)
   if(response.status === 200){
+    localStorage.setItem("lastMaterial", JSON.stringify(newMaterial.value))
     emits("toggleView")
   }else{
     alert("some error occured while posting")
@@ -246,6 +253,7 @@ const emits = defineEmits(["toggleView"]);
 
 <template>
   <div class="flex m-10 justify-center items-start flex-col gap-4 w-full">
+    <button class="bg-blue-400 p-2 rounded-md shadow-md text-white hover:bg-blue-900" @click="copyLastEPD">Copy Last</button>
     <div class="flex flex-col">
       <span class="text-lg font-bold">Additional Sources</span>
       <div class="flex gap-2">
