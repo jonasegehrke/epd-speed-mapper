@@ -79,6 +79,7 @@ const onSelectedOwnerOption = (payload: any) => {
 
 const getDataFromEPDInput = (data, rawData) => {
   newMaterial.value.stages = data;
+  console.log(newMaterial.value)
   rawEmissionData.value = rawData;
 };
 const getSystemBoundries = (data) => {
@@ -229,6 +230,10 @@ const validateForm = () => {
       }
     });
   });
+  if(newMaterial.value.stages.length > 18){
+    errorMessage.value.push("Emission data length er:", newMaterial.value.stages.length);
+        isFormOk.value = false;
+  }
 
   if (newMaterial.value.tags.length <= 0) {
     errorMessage.value.push("Angiv venligst tags");

@@ -2,7 +2,6 @@
 import SearchDropdown from "search-dropdown-vue";
 import { onMounted, ref, watch } from "vue";
 import { uploadFiles } from "../api/services/FileuploadAPi";
-import { createMaterial, sendToLocalBackend } from "../api/services/MaterialApi";
 import { getAllOwners } from "../api/services/OwnerApi";
 import { store } from "../store";
 import Material from "../types/Material";
@@ -276,7 +275,7 @@ const onSubmit = async () => {
   });
 
   console.log(allNewMaterials.value);
-
+  /* 
   allNewMaterials.value.forEach(async (material) => {
     const response = await createMaterial(material);
     console.log(response);
@@ -286,7 +285,7 @@ const onSubmit = async () => {
       alert("some error occured while posting");
     }
   }); 
-  
+   */
 };
 
 const validateForm = () => {
@@ -319,6 +318,15 @@ const validateForm = () => {
       errorMessage.value.push("Missing massUnit");
       isFormOk.value = false;
     }
+    allNewMaterials.value.forEach((material) => {
+      if (material.stages.length > 18) {
+        errorMessage.value.push(
+          "Emission data length er:",
+          material.stages.length
+        );
+        isFormOk.value = false;
+      }
+    });
 
     store.rawMultiEPDData.forEach((element) => {
       console.log(element);

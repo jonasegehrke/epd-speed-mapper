@@ -56,11 +56,13 @@ const collectStages = async () => {
           }
         });
       });
-      stages.value.push(result);
+      if (stages.value.length != 18) {
+        stages.value.push(result);
+      }
     });
     material.stages = stages.value;
   });
-  store.rawMultiEPDData = inputsData.value
+  store.rawMultiEPDData = inputsData.value;
 };
 </script>
 
@@ -81,7 +83,8 @@ const collectStages = async () => {
       <div v-for="input in inputsData" class="flex flex-col gap-1">
         <div v-for="(value, idx) in input">
           <div
-            v-for="(v, k, ) in value" v-if="idx === 0"
+            v-for="(v, k) in value"
+            v-if="idx === 0"
             class="bg-slate-300 rounded-md p-1 justify-between flex w-96"
           >
             <span>{{ k }}</span>

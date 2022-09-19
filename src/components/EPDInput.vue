@@ -13,6 +13,8 @@ watch(data, (newData, _oldData) => {
 });
 
 const handleSubmit = () => {
+  data.value = data.value.replace(/\n(?=1)/gm, "")
+  data.value = data.value.replace(/ – /gm, "-")
   const firstNewLineIndex = data.value.indexOf("\n");
 
   const firstLine = data.value.substr(0, firstNewLineIndex);
@@ -59,6 +61,7 @@ const handleSubmit = () => {
   rows = rows.replace(/\n*$/gm, "");
   //add square brackets around units if missing
   if (rows.indexOf("[") === -1) {
+    rows = rows.replace(/\n(?=-(?= ))/gm, " [");
     rows = rows.replace(/ (?=[a-z])/gm, " [");
     rows = rows.replace(/\n(?=[0-9])/gm, "] ");
   }
@@ -77,6 +80,7 @@ const handleSubmit = () => {
   const result = {};
 
   rowChunks.forEach((row: Array<String>, rowIndex: number) => {
+    console.log(rowIndex)
     let currentKey = "";
     row.forEach((value, valueIndex) => {
       value = value.replace(/\n/g, " ");

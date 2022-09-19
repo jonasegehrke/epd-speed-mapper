@@ -44,8 +44,12 @@ const collectStages = async () => {
         );
       });
     });
-    stages.value.push(result);
+    if(stages.value.length != 18){
+     stages.value.push(result); 
+    }
+    
   });
+  console.log(stages)
   emits("getDataFromEPDInput", stages, inputsData);
 };
 </script>
