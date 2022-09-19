@@ -76,8 +76,9 @@ const allOwners = ref([]);
 
 
 const copyLastEPD = () => {
-  console.log(JSON.parse(localStorage.getItem("lastMaterial")))
   newMaterial.value = JSON.parse(localStorage.getItem("lastMaterial"))
+  boundries.value = JSON.parse(localStorage.getItem("boundries"))
+  newMaterial.value.shortName = ""
 }
 const onSelectedOwnerOption = (payload: any) => {
   newMaterial.value.ownerId = payload.id;
@@ -158,6 +159,7 @@ const onSubmit = async () => {
   console.log(response)
   if(response.status === 200){
     localStorage.setItem("lastMaterial", JSON.stringify(newMaterial.value))
+    localStorage.setItem("boundries", JSON.stringify(boundries.value))
     emits("toggleView")
   }else{
     alert("some error occured while posting")
@@ -253,7 +255,7 @@ const emits = defineEmits(["toggleView"]);
 
 <template>
   <div class="flex m-10 justify-center items-start flex-col gap-4 w-full">
-    <button class="bg-blue-400 p-2 rounded-md shadow-md text-white hover:bg-blue-900" @click="copyLastEPD">Copy Last</button>
+    <button class="bg-orange-400 p-2 rounded-md shadow-md hover:bg-blue-900" @click="copyLastEPD">Copy Last</button>
     <div class="flex flex-col">
       <span class="text-lg font-bold">Additional Sources</span>
       <div class="flex gap-2">

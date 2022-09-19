@@ -28,6 +28,10 @@ const columnDefs = ref([
 
 const rowData = ref<{}[]>([{ "A1A3": "R" }]);
 
+const copyLastEPD = () => {
+  rowData.value = JSON.parse(localStorage.getItem("boundriesRowData"))
+}
+
 const valueMappings = ["R", "MNR", "MND"];
 
 
@@ -47,15 +51,19 @@ const onCellValueChanged = (event: any) => {
 
 
   if(Object.keys(rowData.value[0]).length === 18){
+    localStorage.setItem("boundriesRowData", JSON.stringify(rowData.value))
     emits("getSystemBoundries", rowData.value[0])
   }
 
 };
+
+
 </script>
 
 <template>
   <div>
     <div class="my-1 w-full"></div>
+    <button class="bg-orange-400 p-2 rounded-md shadow-md hover:bg-blue-900 mb-4" @click="copyLastEPD">Copy Last</button>
 
     <ag-grid-vue
       style="width: 100%; height: 110px"
