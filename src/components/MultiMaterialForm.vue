@@ -2,6 +2,7 @@
 import SearchDropdown from "search-dropdown-vue";
 import { onMounted, ref, watch } from "vue";
 import { uploadFiles } from "../api/services/FileuploadAPi";
+import { createMaterial } from "../api/services/MaterialApi";
 import { getAllOwners } from "../api/services/OwnerApi";
 import { store } from "../store";
 import Material from "../types/Material";
@@ -275,17 +276,18 @@ const onSubmit = async () => {
   });
 
   console.log(allNewMaterials.value);
-  /* 
   allNewMaterials.value.forEach(async (material) => {
-    const response = await createMaterial(material);
+    setTimeout( async () => {
+      const response = await createMaterial(material);
     console.log(response);
     if (response.status === 200) {
       emits("toggleView");
     } else {
       alert("some error occured while posting");
-    }
+    }}, 300)
+    
   }); 
-   */
+  
 };
 
 const validateForm = () => {
