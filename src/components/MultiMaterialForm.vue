@@ -391,13 +391,13 @@ const emits = defineEmits(["toggleView"]);
         </span>
       </div>
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 w-8/12">
       <span class="text-lg font-bold">Names</span>
       <div
         v-for="material in allNewMaterials"
         class="flex gap-2 justify-between"
       >
-        <div class="flex flex-col">
+        <div class="flex flex-col w-8/12">
           <span>Name</span>
           <input
             class="rounded-md shadow-md p-2"

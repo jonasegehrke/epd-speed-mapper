@@ -6,6 +6,7 @@ const props = defineProps({
 });
 
 const data: any = ref();
+const linenumber = ref<string>()
 
 const emit = defineEmits(["handleCollectData"]);
 
@@ -16,8 +17,13 @@ watch(data, (newData, _oldData) => {
 const handleSubmit = () => {
   //https://www.epddanmark.dk/media/qiogzsqn/md-18011-en-cembrit-holding.pdf
 
+  let phasesToSkip = []
+  if(linenumber.value != undefined){
+    phasesToSkip = linenumber.value.split(" ")
+  }
+
+
   const allLines = data.value.split("\n");
-  console.log(allLines)
   const stages = allLines[2];
 
   const thirdLineIndex = data.value.indexOf(allLines[3]);
@@ -54,6 +60,21 @@ const handleSubmit = () => {
     const chunk = allRows.slice(i, i + allColumns.length);
     rowChunks.push(chunk);
   }
+  const skippedValues = []
+  rowChunks.forEach((chunk) => {
+    const newChunk = []
+    newChunk[0] = chunk[0]
+    newChunk[1] = chunk[1]
+    chunk.forEach((value, valueIndex) => {
+      phasesToSkip.forEach((phaseToSkip) => {
+        if(valueIndex === Number(phaseToSkip) + 1){
+          newChunk.push(value)
+        }
+      })
+      
+    })
+    skippedValues.push(newChunk)
+  })
 
   const results = [];
 
@@ -86,7 +107,7 @@ const handleSubmit = () => {
           result[currentKey].unit = value;
           return;
         }
-
+        
         if (valueIndex === materialIndex + 2) {
           if (allColumns[valueIndex].includes("-")) {
             if (allColumns[valueIndex] != "A1-A3") {
@@ -120,15 +141,43 @@ const handleSubmit = () => {
     results.push(result);
   });
 
-  console.log(results)
+
+  skippedValues.forEach((row: Array<String>, rowIndex: number) =>{
+    let currentKey = null
+    let unit = null
+    row.forEach((value, valueIndex) => {
+      if(allColumns[valueIndex + Number(phasesToSkip[0])-1] === undefined){
+        return
+      }
+      if(valueIndex === 0){
+        value = value.replace(/[0-9]/g, "");
+        currentKey = value
+        return
+      }
+      if(valueIndex === 1){
+        unit = value
+        return
+      }
+
+      
+      results.forEach((result) => {
+        result[currentKey][allColumns[valueIndex + Number(phasesToSkip[0])-1]] = value
+      })
+      
+    })
+  })
+  
+
   return results;
 };
 </script>
 
 <template>
-  <textarea
-    v-model="data"
-    rows="5"
-    class="rounded-md shadow-md indent-2 w-full"
-  ></textarea>
+
+    <input type="text" placholder="linenumber" class="rounded-md shadow-md p-2 mb-5" v-model="linenumber">
+    <textarea
+      v-model="data"
+      rows="5"
+      class="rounded-md shadow-md indent-2 w-full"
+    ></textarea>
 </template>

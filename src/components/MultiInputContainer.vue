@@ -61,6 +61,7 @@ const collectStages = async () => {
       }
     });
     material.stages = stages.value;
+    console.log(material.stages)
   });
   store.rawMultiEPDData = inputsData.value;
 };
