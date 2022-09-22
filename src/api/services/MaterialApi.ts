@@ -55,6 +55,26 @@ export const sendToLocalBackend = async (data: Material) => {
   }
 };
 
+export const sendLinkedToLocal = async (data: Material) => {
+  const response = await localClient.post("writeLinked", data);
+  if (response.status === 200) {
+    return response;
+  } else {
+    alert("FAILED TO POST TO LOCAL")
+    return response
+  }
+};
+
+export async function getNextMaterial() {
+  const response = await localClient.get(`getNextMaterial`);
+  if (response.status === 200) {
+    return response.data;
+  } else {
+    alert("FAILED TO GET LOCAL")
+    return response
+  }
+}
+
 export async function updateMaterial(data: Material, id: string) {
   const response = await apiClient.put(`api/material/${id}`, data);
 

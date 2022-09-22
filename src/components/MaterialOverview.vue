@@ -4,6 +4,7 @@ import { getAllEDP } from "../api/services/MaterialApi";
 import MaterialForm from "./MaterialForm.vue";
 import FilterSwitch from "./FilterSwitch.vue";
 import MultiMaterialForm from "./MultiMaterialForm.vue";
+import AssignLinkToEpd from "./AssignLinkToEpd.vue";
 
 const materialArray = ref();
 const createNewView = ref<Boolean>(false); //TODO CHANGE
@@ -31,31 +32,9 @@ const changeMonoPolyEPD = () => {
 </script>
 
 <template>
-  <h1 v-if="!createNewView" class="text-red-500 text-9xl font-bold">HUSK NU FORFILAN AT TÆNDE LOCAL BACKEND!</h1>
 
-  <div v-if="createNewView" class="flex w-full h-full items-center flex-col ml-5">
-    <FilterSwitch @changeMonoPolyEPD="changeMonoPolyEPD"/>
-    <MaterialForm v-if="isSingleEPD" @toggleView=toggleView />
-    <MultiMaterialForm v-if="!isSingleEPD" @toggleView=toggleView />
+  <div class="flex w-full h-full items-center flex-col ml-5">
+    <AssignLinkToEpd />
   </div>
 
-  <div v-else class="flex flex-col m-10 justify-center items-center">
-    <button
-      @click="toggleView"
-      class="bg-slate-500 rounded-md shadow-md text-white font-bold p-2 my-10 w-4/12"
-    >
-      Create Material
-    </button>
-    <div
-      class="bg-slate-300 flex justify-center flex-col items-center rounded-md shadow-md w-full"
-    >
-      <div
-        class="flex justify-between border w-full"
-        v-for="material in materialArray"
-      >
-        <span>{{ material.id }}</span>
-        <span>{{ material.shortName }}</span>
-      </div>
-    </div>
-  </div>
 </template>
