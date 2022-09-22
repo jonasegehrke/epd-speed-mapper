@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { store } from '../store'
+import { store } from "../store";
 const props = defineProps({
   id: Number,
 });
 
 const data: any = ref();
-const linenumber = ref<string>()
+const linenumber = ref<string>();
 
 const emit = defineEmits(["handleCollectData"]);
 
@@ -17,11 +17,10 @@ watch(data, (newData, _oldData) => {
 const handleSubmit = () => {
   //https://www.epddanmark.dk/media/qiogzsqn/md-18011-en-cembrit-holding.pdf
 
-  let phasesToSkip = []
-  if(linenumber.value != undefined){
-    phasesToSkip = linenumber.value.split(" ")
+  let phasesToSkip = [];
+  if (linenumber.value != undefined) {
+    phasesToSkip = linenumber.value.split(" ");
   }
-
 
   const allLines = data.value.split("\n");
   const stages = allLines[2];
@@ -60,21 +59,20 @@ const handleSubmit = () => {
     const chunk = allRows.slice(i, i + allColumns.length);
     rowChunks.push(chunk);
   }
-  const skippedValues = []
+  const skippedValues = [];
   rowChunks.forEach((chunk) => {
-    const newChunk = []
-    newChunk[0] = chunk[0]
-    newChunk[1] = chunk[1]
+    const newChunk = [];
+    newChunk[0] = chunk[0];
+    newChunk[1] = chunk[1];
     chunk.forEach((value, valueIndex) => {
       phasesToSkip.forEach((phaseToSkip) => {
-        if(valueIndex === Number(phaseToSkip) + 1){
-          newChunk.push(value)
+        if (valueIndex === Number(phaseToSkip) + 1) {
+          newChunk.push(value);
         }
-      })
-      
-    })
-    skippedValues.push(newChunk)
-  })
+      });
+    });
+    skippedValues.push(newChunk);
+  });
 
   const results = [];
 
@@ -107,7 +105,7 @@ const handleSubmit = () => {
           result[currentKey].unit = value;
           return;
         }
-        
+
         if (valueIndex === materialIndex + 2) {
           if (allColumns[valueIndex].includes("-")) {
             if (allColumns[valueIndex] != "A1-A3") {
@@ -133,51 +131,80 @@ const handleSubmit = () => {
             }
           }
           result[currentKey][allColumns[valueIndex]] = value;
-        }else{
-            return
+        } else {
+          return;
         }
       });
     });
     results.push(result);
   });
 
-
-  skippedValues.forEach((row: Array<String>, rowIndex: number) =>{
-    let currentKey = null
-    let unit = null
+  skippedValues.forEach((row: Array<String>, rowIndex: number) => {
+    let currentKey = null;
+    let unit = null;
     row.forEach((value, valueIndex) => {
-      if(allColumns[valueIndex + Number(phasesToSkip[0])-1] === undefined){
-        return
+      if (allColumns[valueIndex + Number(phasesToSkip[0]) - 1] === undefined) {
+        return;
       }
-      if(valueIndex === 0){
+      if (valueIndex === 0) {
         value = value.replace(/[0-9]/g, "");
-        currentKey = value
-        return
+        currentKey = value;
+        return;
       }
-      if(valueIndex === 1){
-        unit = value
-        return
+      if (valueIndex === 1) {
+        unit = value;
+        return;
       }
 
-      
       results.forEach((result) => {
-        result[currentKey][allColumns[valueIndex + Number(phasesToSkip[0])-1]] = value
-      })
-      
-    })
-  })
-  
+        if (allColumns[valueIndex + Number(phasesToSkip[0]) - 1].includes("-")) {
+          if (allColumns[valueIndex + Number(phasesToSkip[0]) - 1] != "A1-A3") {
+            //Split B2-B7 to B2, B3, B4...
+            const splitFirst = allColumns[valueIndex + Number(phasesToSkip[0]) - 1].substr(0, 2).split("");
+            const splitLast = allColumns[valueIndex + Number(phasesToSkip[0]) - 1].substr(3, 5).split("");
+            let key = splitFirst[0];
+            let itteratorCap = Number(splitLast[1]);
+            if (splitLast[0] === "C") {
+              itteratorCap = 7 - Number(splitFirst[1]) + Number(splitLast[1]);
+            }
+            for (let i = Number(splitFirst[1]); i < itteratorCap + 1; i++) {
+              result[currentKey][key + `${i}`] = value;
+              console.log(result[currentKey][key + `${i}`], key)
+              if (i == 7 && splitLast[0] === "C") {
+                console.log("Im here")
+                key = splitLast[0];
+                result[currentKey]["C1"] = value;
+              }
+            }
 
+            return;
+          }
+        }
+        result[currentKey][
+          allColumns[valueIndex + Number(phasesToSkip[0]) - 1]
+        ] = value;
+
+        console.log("ressetting")
+      });
+    });
+  });
+
+
+  console.log(results)
   return results;
 };
 </script>
 
 <template>
-
-    <input type="text" placholder="linenumber" class="rounded-md shadow-md p-2 mb-5" v-model="linenumber">
-    <textarea
-      v-model="data"
-      rows="5"
-      class="rounded-md shadow-md indent-2 w-full"
-    ></textarea>
+  <input
+    type="text"
+    placholder="linenumber"
+    class="rounded-md shadow-md p-2 mb-5"
+    v-model="linenumber"
+  />
+  <textarea
+    v-model="data"
+    rows="5"
+    class="rounded-md shadow-md indent-2 w-full"
+  ></textarea>
 </template>
