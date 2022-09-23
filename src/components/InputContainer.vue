@@ -3,16 +3,11 @@ import { ref } from "vue";
 import { getStageTypeEnum } from "../api/services/MaterialApi";
 import EPDInput from "./EPDInput.vue";
 
-const emits = defineEmits(["getDataFromEPDInput"]);
+const emits = defineEmits(["getDataFromEPDInput", "getABvalues"]);
 
-const amountOfInputs = ref(1);
+const amountOfInputs = ref(3);
 const stages = ref([]);
 const inputsData: any = ref([]);
-
-const addNewInput = () => {
-  amountOfInputs.value++;
-  inputsData.value.push([]);
-};
 
 const handleCollectData = (data, id) => {
   inputsData.value[id] = data;
@@ -44,13 +39,13 @@ const collectStages = async () => {
         );
       });
     });
-    if(stages.value.length != 18){
-     stages.value.push(result); 
+    if (stages.value.length != 18) {
+      stages.value.push(result);
     }
-    
   });
-  console.log(stages)
-  emits("getDataFromEPDInput", stages, inputsData);
+
+  //emits("getDataFromEPDInput", stages, inputsData);
+  emits("getABvalues", stages.value, inputsData);
 };
 </script>
 
@@ -59,14 +54,7 @@ const collectStages = async () => {
     <div v-for="amount in amountOfInputs">
       <EPDInput @handleCollectData="handleCollectData" :id="amount" />
     </div>
-    <div class="flex gap-6">
-      <button
-        @click="addNewInput"
-        class="bg-blue-400 p-2 rounded-md shadow-md h-10 text-white hover:bg-blue-800"
-      >
-        Add another table
-      </button>
-    </div>
+
     <div class="gap-4 flex flex-col">
       <div v-for="input in inputsData" class="flex flex-col gap-1">
         <div

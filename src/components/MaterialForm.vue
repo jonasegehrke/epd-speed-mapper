@@ -86,7 +86,7 @@ const onSelectedOwnerOption = (payload: any) => {
 
 const getDataFromEPDInput = (data, rawData) => {
   newMaterial.value.stages = data;
-  console.log(newMaterial.value)
+
   rawEmissionData.value = rawData;
 };
 const getSystemBoundries = (data) => {

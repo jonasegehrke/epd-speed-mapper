@@ -7,10 +7,12 @@ import { getAllOwners } from "../api/services/OwnerApi";
 import { store } from "../store";
 import Material from "../types/Material";
 import Stage from "../types/Stage";
-import MultiInputContainer from "./MultiInputContainer.vue";
+import InputContainer from "./InputContainer.vue";
 import SystemBoundary from "./SystemBoundary.vue";
 
 const stages = ref<Array<Stage>>([]);
+const TableA = ref<Array<Stage>>([]);
+const TableB = ref<Array<Stage>>([]);
 const boundries = ref({});
 const currentTag = ref("");
 const currentLink = ref("");
@@ -18,7 +20,7 @@ const files = ref<HTMLInputElement | null>(null);
 const uploadedFiles = ref<string[]>([]);
 const errorMessage = ref<Array<String>>([]);
 const isFormOk = ref<boolean>(true);
-const rawEmissionData = ref();
+const rawEmissionData = ref([]);
 const amountOfEPD = ref<number>(1);
 const allOwners = ref([]);
 
@@ -56,20 +58,21 @@ const selectedMassValues = ref([
 
 const newMaterial = ref<Material>({
   ownerId: "",
+  scaleFactor: -1,
   custom: false,
   scraped: false,
   generic: false,
   expectedLifespan: -1,
-  shortName: "",
+  shortName: "Facade element ETA50 - Panel filling  - ",
   description: "",
   additionalSources: [],
   link: uploadedFiles.value,
   stages: stages,
   declaredUnit: {
-    declaredUnit: -1,
-    declaredValue: -1,
+    declaredUnit: 4,
+    declaredValue: 1,
     mass: -1,
-    massUnit: -1,
+    massUnit: 1,
   },
   epdInfo: {
     epdSpecificationForm: -1,
@@ -83,20 +86,21 @@ const newMaterial = ref<Material>({
 const allNewMaterials = ref<Array<Material>>([
   {
     ownerId: "",
+    scaleFactor: -1,
     custom: false,
     scraped: false,
     generic: false,
     expectedLifespan: -1,
-    shortName: "",
+    shortName: "Facade element ETA50 - Panel filling  - ",
     description: "",
     additionalSources: [],
     link: uploadedFiles.value,
     stages: stages,
     declaredUnit: {
-      declaredUnit: -1,
-      declaredValue: -1,
+      declaredUnit: 4,
+      declaredValue: 1,
       mass: -1,
-      massUnit: -1,
+      massUnit: 1,
     },
     epdInfo: {
       epdSpecificationForm: -1,
@@ -110,6 +114,7 @@ const allNewMaterials = ref<Array<Material>>([
 
 watch(amountOfEPD, (newAmount, _oldAmount) => {
   allNewMaterials.value = [];
+  store.amountOfEPD = newAmount;
   for (let i = 0; i < newAmount; i++) {
     const copy = JSON.parse(JSON.stringify(newMaterial.value));
     allNewMaterials.value.push(copy);
@@ -247,6 +252,26 @@ onMounted(async () => {
 const onSubmit = async () => {
   errorMessage.value = [];
 
+  console.log("A: ", TableA.value);
+  console.log("B: ", TableB.value);
+
+  allNewMaterials.value.forEach((material) => {
+    TableA.value.forEach((aValue, aIndex) => {
+      const stage = {};
+      stage.measures = {};
+      stage.stageType = aValue.stageType;
+      Object.keys(aValue.measures).forEach((key, keyIndex) => {
+        stage.measures[key] =
+          aValue.measures[key] * material.scaleFactor +
+          TableB.value[aIndex].measures[key];
+      });
+      material.stages[aIndex] = stage;
+    });
+    delete material.scaleFactor;
+  });
+
+  console.log(allNewMaterials.value);
+
   setDescription();
   uploadFileAndAssign();
   setIssuedAt();
@@ -277,17 +302,16 @@ const onSubmit = async () => {
 
   console.log(allNewMaterials.value);
   allNewMaterials.value.forEach(async (material) => {
-    setTimeout( async () => {
+    setTimeout(async () => {
       const response = await createMaterial(material);
-    console.log(response);
-    if (response.status === 200) {
-      emits("toggleView");
-    } else {
-      alert("some error occured while posting");
-    }}, 300)
-    
-  }); 
-  
+      console.log(response);
+      if (response.status === 200) {
+        emits("toggleView");
+      } else {
+        alert("some error occured while posting");
+      }
+    }, 300);
+  });
 };
 
 const validateForm = () => {
@@ -329,23 +353,20 @@ const validateForm = () => {
         isFormOk.value = false;
       }
     });
-
-    store.rawMultiEPDData.forEach((element) => {
-      console.log(element);
-      element.forEach((prox) => {
-        Object.keys(prox).forEach((key, idx) => {
-          if (prox[key].unit.match(/\[[^\]]*\]/gm) === null) {
-            errorMessage.value.push("Valider venligst din emission data");
-            isFormOk.value = false;
-            return;
-          }
-        });
-      });
-    });
   });
 };
 
 const emits = defineEmits(["toggleView"]);
+
+const getAValues = (data, rawData) => {
+  TableA.value = data;
+  rawEmissionData.value.push(rawData);
+};
+
+const getBValues = (data, rawData) => {
+  TableB.value = data;
+  rawEmissionData.value.push(rawData);
+};
 </script>
 
 <template>
@@ -391,19 +412,28 @@ const emits = defineEmits(["toggleView"]);
         </span>
       </div>
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 w-10/12">
       <span class="text-lg font-bold">Names</span>
       <div
         v-for="material in allNewMaterials"
-        class="flex gap-2 justify-between"
+        class="flex gap-2 justify-between w-full"
       >
-        <div class="flex flex-col">
+        <div class="flex flex-col w-full">
           <span>Name</span>
           <input
             class="rounded-md shadow-md p-2"
             type="text"
             placeholder="Navn"
             v-model="material.shortName"
+          />
+        </div>
+        <div class="flex flex-col">
+          <span>Scale Factor</span>
+          <input
+            class="rounded-md shadow-md p-2"
+            type="number"
+            placeholder="scale"
+            v-model="material.scaleFactor"
           />
         </div>
       </div>
@@ -498,7 +528,7 @@ const emits = defineEmits(["toggleView"]);
           v-model="epdProductIndustryType"
         >
           <option :value="0">Industry</option>
-          <option :value="1">Product</option>
+          <option selected :value="1">Product</option>
         </select>
       </div>
       <div class="flex flex-col">
@@ -578,8 +608,16 @@ const emits = defineEmits(["toggleView"]);
 
     <div class="flex flex-col w-11/12">
       <span class="text-lg font-bold">Emission - values</span>
-      <!-- TODO fix multi -->
-      <MultiInputContainer />
+      <div class="flex gap-6">
+        <div class="w-full">
+          <span>A - Table 15 - Table 17</span>
+          <InputContainer @getABvalues="getAValues" />
+        </div>
+        <div class="w-full">
+          <span>B - Table 18 - Table 20</span>
+          <InputContainer @getABvalues="getBValues" />
+        </div>
+      </div>
     </div>
 
     <div class="flex flex-col text-red-600 font-bold" v-if="!isFormOk">

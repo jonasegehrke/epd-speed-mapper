@@ -15,9 +15,8 @@ watch(data, (newData, _oldData) => {
 
 const handleSubmit = () => {
   //https://www.epddanmark.dk/media/qiogzsqn/md-18011-en-cembrit-holding.pdf
-
   const allLines = data.value.split("\n");
-  console.log(allLines)
+
   const stages = allLines[2];
 
   const thirdLineIndex = data.value.indexOf(allLines[3]);
@@ -120,7 +119,7 @@ const handleSubmit = () => {
     results.push(result);
   });
 
-  console.log(results)
+
   return results;
 };
 </script>

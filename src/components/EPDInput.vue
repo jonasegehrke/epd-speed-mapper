@@ -80,12 +80,13 @@ const handleSubmit = () => {
   const result = {};
 
   rowChunks.forEach((row: Array<String>, rowIndex: number) => {
-    console.log(rowIndex)
+
     let currentKey = "";
     row.forEach((value, valueIndex) => {
       value = value.replace(/\n/g, " ");
       if (valueIndex === 0) {
         value = value.replace(/[0-9]/g, "");
+        value = value.replace(/[*]/gm, "");
         currentKey = value;
         result[currentKey] = {};
         return;
@@ -133,7 +134,7 @@ const handleSubmit = () => {
       result[currentKey][allColumns[valueIndex]] = value;
     });
   });
-  console.log(result)
+
   return result;
 };
 
